@@ -1,0 +1,12 @@
+{
+    "description": "SeeDAO badge of productor's guild",
+    "external_url": "https://seedao.xyz/",
+    "image": "https://storage.googleapis.com/opensea-prod.appspot.com/puffs/4.png",
+    "name": "SeeDAO Prod Badge",
+    "attributes": [
+        {
+            "trait_type": "guild",
+            "value": "prod"
+        }
+    ]
+}

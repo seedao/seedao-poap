@@ -1,0 +1,12 @@
+{
+    "description": "SeeDAO badge of developer's guild",
+    "external_url": "https://seedao.xyz/",
+    "image": "https://storage.googleapis.com/opensea-prod.appspot.com/puffs/3.png",
+    "name": "SeeDAO Dev Badge",
+    "attributes": [
+        {
+            "trait_type": "guild",
+            "value": "dev"
+        }
+    ]
+}
