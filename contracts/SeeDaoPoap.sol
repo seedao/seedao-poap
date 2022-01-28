@@ -12,29 +12,23 @@ contract SeeDaoPoap is
     PausableUpgradeable
 {
     address private _signer;
+    mapping(bytes32 => bool) public claimed;
 
     constructor() {}
 
     function initialize() public initializer {
         __ERC1155_init(
-            "https://seedao.github.io/seedao-poap-meta/meta/{id}.json"
+            "https://k51qzi5uqu5dhrzcxk68q1k8ba9rwu3lsw34qvph2hl36hax0fyem7mu5miafc.ipns.dweb.link/{id}.json"
         );
         __Ownable_init();
         __Pausable_init();
         _signer = 0x0F34EC76daCa79425Feec7106BADe663DEfC00fa;
     }
 
-    function mint(
-        address to,
-        uint256 id,
-        uint256 amount
-    ) public onlyOwner {
-        _mint(to, id, amount, "");
-    }
-
     function claim(
         uint256[] memory ids,
         uint256[] memory amounts,
+        bytes32 ticket,
         uint256 timestamp,
         bytes memory signature
     ) public whenNotPaused {
@@ -43,13 +37,12 @@ contract SeeDaoPoap is
                 block.timestamp - 1 days <= timestamp,
             "Bad timestamp"
         );
-        bytes32 message = prefixed(
-            keccak256(abi.encodePacked(msg.sender, ids, amounts, timestamp))
-        );
         require(
-            recoverSigner(message, signature) == _signer,
+            verify(msg.sender, ids, amounts, ticket, timestamp, signature),
             "Illegal signature"
         );
+        require(!claimed[ticket], "Claimed");
+        claimed[ticket] = true;
         _mintBatch(msg.sender, ids, amounts, "");
     }
 
@@ -57,21 +50,28 @@ contract SeeDaoPoap is
         address to,
         uint256[] memory ids,
         uint256[] memory amounts,
+        bytes32 ticket,
         uint256 timestamp,
         bytes memory signature
     ) public view returns (bool) {
         bytes32 message = prefixed(
-            keccak256(abi.encodePacked(to, ids, amounts, timestamp))
+            keccak256(abi.encodePacked(to, ids, amounts, ticket, timestamp))
         );
         return recoverSigner(message, signature) == _signer;
     }
 
-    function mintBatch(
-        address to,
+    function mintTo(
+        address[] memory owners,
         uint256[] memory ids,
         uint256[] memory amounts
     ) public onlyOwner {
-        _mintBatch(to, ids, amounts, "");
+        require(
+            owners.length == ids.length && ids.length == amounts.length,
+            "Parameters must have the same length"
+        );
+        for (uint256 i = 0; i < ids.length; i++) {
+            _mint(owners[i], ids[i], amounts[i], "");
+        }
     }
 
     function setSigner(address newSigner) public onlyOwner {
