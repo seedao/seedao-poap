@@ -1,16 +1,16 @@
-// test/Box.proxy.test.js
+// test/Box.test.js
 // Load dependencies
 const { expect } = require('chai');
-const { deployProxy } = require('@openzeppelin/truffle-upgrades');
 
 // Load compiled artifacts
-const POAPV1 = artifacts.require('SeeDaoPoap');
+const MSCV2 = artifacts.require('MSCV2');
 
 // Start test block
-contract('POAP v1 (proxy)', function (accounts) {
-    beforeEach(async function () {
+contract('POAP v1', function (accounts) {
+    before(async function () {
         // Deploy a new Box contract for each test
-        this.poap = await deployProxy(POAPV1);
+        this.poap = await MSCV2.new();
+        await this.poap.initialize();
     });
 
     it('initialize correctly', async function () {
